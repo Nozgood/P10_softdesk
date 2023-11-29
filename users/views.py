@@ -19,7 +19,7 @@ class SignUpAPIView(APIView):
     def post(request):
         try:
             data = JSONParser().parse(request)
-            print(f"{data}")
+            print(f"data : {data}")
             serializer = UserSerializer(data=data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
