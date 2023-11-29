@@ -26,13 +26,11 @@ class UserSerializer(ModelSerializer):
 
     def validate(self, attrs):
         age = attrs.get("age")
-        can_be_shared = attrs.get("data_can_be_shared")
-        print(f"age: {age} can_be_shared:{can_be_shared}")
-        if age and age < 15 and can_be_shared is True:
+        if age < 15:
             raise ValidationError(
                 {
                     "RGPD error":
-                        "You must be at least 15 to allow data sharing",
+                        "You must be at least 15 to be allow to create an account",
                 }
             )
         return attrs
