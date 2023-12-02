@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer, ValidationError
 from rest_framework.fields import BooleanField
-from users.models import User
+from users.models import User, LoginUser
 
 class UserSerializer(ModelSerializer):
 
@@ -31,6 +31,23 @@ class UserSerializer(ModelSerializer):
                 {
                     "RGPD error":
                         "You must be at least 15 to be allow to create an account",
+                }
+            )
+        return attrs
+
+class LoginSerializer(ModelSerializer):
+    class Meta:
+        model = LoginUser
+        fields = [
+            "username",
+            "password",
+        ]
+
+    def validate(self, attrs):
+        if len(attrs["password"]) == 0 or len(attrs["username"]) == 0:
+            raise ValidationError(
+                {
+                    "Error": "Please filled a username and a password to login"
                 }
             )
         return attrs

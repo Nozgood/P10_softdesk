@@ -20,3 +20,11 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.username}'
+
+class LoginUser(models.Model):
+    username = models.CharField(
+        max_length=150,
+    )
+    password = models.CharField(
+        max_length=150,
+    )
