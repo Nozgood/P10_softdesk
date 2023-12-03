@@ -8,6 +8,7 @@ from json import JSONDecodeError
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from django.contrib.auth.hashers import check_password
+from rest_framework.permissions import IsAuthenticated
 
 
 class SignUpAPIView(APIView):
@@ -84,21 +85,42 @@ class LoginAPIView(APIView):
 
 
 class DeleteUserAPIView(APIView):
-    def delete(self, request):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def delete(request):
+        user_to_delete = User.objects.get(id=request.user.id)
+        user_to_delete.delete()
         return JsonResponse(
             {
-                "response": "error",
-                "message": "delete not implemented",
+                "response": "success",
+                "message": "user successfully deleted",
             },
-            status=400)
+            status=201)
 
 
 class UpdateUserAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def put(self, request):
-        print("hello bro")
-        return JsonResponse(
-            {
-                "response": "error",
-                "message": "put not implemented",
-            },
-            status=400)
+        try:
+            user = get_object_or_404(User, id=request.user.id)
+            data = JSONParser().parse(request)
+            serializer = UserSerializer(user, data=data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return JsonResponse(
+                    {
+                        "response": "success",
+                        "message": "user successfully updated"
+                    },
+                    status=201
+                )
+        except JSONDecodeError:
+            return JsonResponse(
+                {
+                    "response": "error",
+                    "message": "JSON decoding error"
+                },
+                status=400
+            )
