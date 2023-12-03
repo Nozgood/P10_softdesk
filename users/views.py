@@ -83,6 +83,23 @@ class LoginAPIView(APIView):
                 },
                 status=400)
 
+class GetUserAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request):
+        user = get_object_or_404(User, id=request.user.id)
+        return JsonResponse(
+            {
+                "email": user.email,
+                "username": user.username,
+                "password": user.password,
+                "age": user.age,
+                "can_be_contacted": user.can_be_contacted,
+                "data_can_be_shared": user.data_can_be_shared
+            },
+            status=200
+        )
 
 class DeleteUserAPIView(APIView):
     permission_classes = [IsAuthenticated]
