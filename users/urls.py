@@ -9,15 +9,4 @@ urlpatterns = [
     path('login/', views.LoginAPIView.as_view(), name='login'),
     path('update/', views.UpdateUserAPIView.as_view(), name='update_user'),
     path('delete/', views.DeleteUserAPIView.as_view(), name='delete_user'),
-    path(
-        'token/',
-        jwt_views.TokenObtainPairView.as_view(),
-        name='token_obtain_pair'
-    ),
-    path(
-        'token/refresh/',
-        jwt_views.TokenRefreshView.as_view(),
-        name='token_refresh'
-    ),
-
 ]

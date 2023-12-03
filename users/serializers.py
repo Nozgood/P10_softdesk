@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, ValidationError
 from rest_framework.fields import BooleanField
 from users.models import User, LoginUser
-
+from django.contrib.auth.hashers import make_password
 class UserSerializer(ModelSerializer):
 
     class Meta:
@@ -24,13 +24,18 @@ class UserSerializer(ModelSerializer):
         required=True
     )
 
+    @staticmethod
+    def validate_password(value):
+        return make_password(value)
+
     def validate(self, attrs):
         age = attrs.get("age")
         if age < 15:
             raise ValidationError(
                 {
                     "RGPD error":
-                        "You must be at least 15 to be allow to create an account",
+                        "You must be at least 15 to be "
+                        "allow to create an account",
                 }
             )
         return attrs
@@ -51,3 +56,4 @@ class LoginSerializer(ModelSerializer):
                 }
             )
         return attrs
+
