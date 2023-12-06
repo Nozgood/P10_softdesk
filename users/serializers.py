@@ -1,6 +1,10 @@
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import (
+    ModelSerializer,
+    ValidationError,
+    CharField
+)
 from rest_framework.fields import BooleanField
-from users.models import User, LoginUser
+from users.models import User
 from django.contrib.auth.hashers import make_password
 class UserSerializer(ModelSerializer):
 
@@ -41,14 +45,18 @@ class UserSerializer(ModelSerializer):
         return attrs
 
 class LoginSerializer(ModelSerializer):
+    username = CharField(max_length=150)
+    password = CharField(max_length=128)
+
     class Meta:
-        model = LoginUser
+        model = User
         fields = [
             "username",
             "password",
         ]
 
     def validate(self, attrs):
+        print("login validator")
         if len(attrs["password"]) == 0 or len(attrs["username"]) == 0:
             raise ValidationError(
                 {
@@ -56,4 +64,3 @@ class LoginSerializer(ModelSerializer):
                 }
             )
         return attrs
-

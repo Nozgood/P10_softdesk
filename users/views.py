@@ -25,7 +25,7 @@ class SignUpAPIView(APIView):
             data = JSONParser().parse(request)
             print(f"data : {data}")
             serializer = UserSerializer(data=data)
-            if serializer.is_valid(raise_exception=True):
+            if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
         except JSONDecodeError:
@@ -42,8 +42,10 @@ class LoginAPIView(APIView):
     def post(request):
         try:
             data = JSONParser().parse(request)
+            print(f'data: {data}')
             serializer = LoginSerializer(data=data)
-            if not serializer.is_valid():
+            print(f"serializer: {serializer}")
+            if not serializer.is_valid(raise_exception=True):
                 return JsonResponse(
                     {
                         "response": "error",
@@ -83,7 +85,8 @@ class LoginAPIView(APIView):
                 },
                 status=400)
 
-class GetUserAPIView(APIView):
+
+class UserAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     @staticmethod
@@ -101,25 +104,8 @@ class GetUserAPIView(APIView):
             status=200
         )
 
-class DeleteUserAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @staticmethod
-    def delete(request):
-        user_to_delete = User.objects.get(id=request.user.id)
-        user_to_delete.delete()
-        return JsonResponse(
-            {
-                "response": "success",
-                "message": "user successfully deleted",
-            },
-            status=201)
-
-
-class UpdateUserAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request):
+    def put(request):
         try:
             user = get_object_or_404(User, id=request.user.id)
             data = JSONParser().parse(request)
@@ -141,3 +127,14 @@ class UpdateUserAPIView(APIView):
                 },
                 status=400
             )
+
+    @staticmethod
+    def delete(request):
+        user_to_delete = User.objects.get(id=request.user.id)
+        user_to_delete.delete()
+        return JsonResponse(
+            {
+                "response": "success",
+                "message": "user successfully deleted",
+            },
+            status=201)

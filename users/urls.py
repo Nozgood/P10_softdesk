@@ -7,7 +7,7 @@ app_name = "users"
 urlpatterns = [
     path('signup/', views.SignUpAPIView.as_view(), name='signup'),
     path('login/', views.LoginAPIView.as_view(), name='login'),
-    path('', views.GetUserAPIView.as_view(), name='get_user'),
-    path('update/', views.UpdateUserAPIView.as_view(), name='update_user'),
-    path('delete/', views.DeleteUserAPIView.as_view(), name='delete_user'),
+    path('', views.UserAPIView.as_view(), name='get_user'),
+    path('update/', views.UserAPIView.as_view(), name='update_user'),
+    path('delete/', views.UserAPIView.as_view(), name='delete_user'),
 ]
