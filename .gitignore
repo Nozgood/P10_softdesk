@@ -2,6 +2,7 @@ env/
 
 __pycache__/
 softdesk/__pycache__/
+softdesk_management/__pycache__/
 users/__pycache__/
 users/migrations/__pycache__/
 
