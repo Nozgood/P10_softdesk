@@ -1,5 +1,9 @@
-from rest_framework.serializers import ModelSerializer, ValidationError
-from softdesk_management.models import Project
+from rest_framework.serializers import (
+    ModelSerializer,
+    ValidationError,
+    CharField
+)
+from softdesk_management.models import Project, Contributor
 
 PROJECT_TYPES = [
     "back-end",
@@ -28,3 +32,25 @@ class ProjectSerializer(ModelSerializer):
             "description",
             "type"
         ]
+
+class ContributorSerializer(ModelSerializer):
+    project_name = CharField(max_length=150)
+
+    class Meta:
+        model = Contributor
+        fields = [
+            "project_name"
+        ]
+
+    def create(self, validated_data):
+        project_name = validated_data.pop("project_name")
+        try:
+            project = Project.objects.get(name=project_name)
+        except Project.DoesNotExist:
+            raise ValidationError(
+                "the project you are trying to join doesn't exist"
+            )
+        return Contributor.objects.create(
+            project=project,
+            user=self.context["request"].user
+        )

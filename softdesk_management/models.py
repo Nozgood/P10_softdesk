@@ -1,6 +1,13 @@
 from django.db import models
 from softdesk import settings
 
+PROJECT_TYPES = [
+    "back-end",
+    "front-end",
+    "iOS",
+    "Android"
+]
+
 class Project(models.Model):
     author = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
@@ -9,9 +16,10 @@ class Project(models.Model):
     )
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=250)
-    type = models.CharField(max_length=10)
+    type = models.TextChoices(PROJECT_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
+
 
 class Contributor(models.Model):
     user = models.ForeignKey(
