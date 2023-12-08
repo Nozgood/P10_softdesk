@@ -5,7 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from json import JSONDecodeError
 from django.http import JsonResponse
+
 from softdesk_management.serializers import ProjectSerializer
+from softdesk_management.models import Contributor
 
 class ProjectAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -20,7 +22,11 @@ class ProjectAPIView(APIView):
                 context={"request": request}
             )
             if serializer.is_valid(raise_exception=True):
-                serializer.save()
+                project = serializer.save()
+                Contributor.objects.create(
+                    project=project,
+                    user=request.user
+                )
                 return Response(serializer.data)
         except JSONDecodeError:
             return JsonResponse(
