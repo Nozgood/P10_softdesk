@@ -9,6 +9,12 @@ PROJECT_TYPES = [
 ]
 
 class Project(models.Model):
+    class ProjectType(models.TextChoices):
+        BACKEND = 'back-end'
+        FRONTEND = 'front-end'
+        IOS = 'iOS'
+        ANDROID = "android"
+
     author = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -16,7 +22,7 @@ class Project(models.Model):
     )
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=250)
-    type = models.TextChoices(PROJECT_TYPES)
+    type = models.CharField(max_length=10, choices=ProjectType.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 

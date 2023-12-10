@@ -10,7 +10,7 @@ urlpatterns = [
         name='create_project'
     ),
     path(
-        'project/get/<int:id>',
+        'project/get/<int:project_id>',
         ProjectAPIView.as_view(),
         name='create_project'
     ),

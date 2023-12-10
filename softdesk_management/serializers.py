@@ -1,25 +1,12 @@
 from rest_framework.serializers import (
     ModelSerializer,
     ValidationError,
-    CharField
+    IntegerField
 )
 from softdesk_management.models import Project, Contributor
-
-PROJECT_TYPES = [
-    "back-end",
-    "front-end",
-    "iOS",
-    "Android"
-]
+from django.db import IntegrityError
 
 class ProjectSerializer(ModelSerializer):
-
-    def validate(self, attrs):
-        project_type = attrs["type"]
-        if project_type in PROJECT_TYPES:
-            return attrs
-        raise ValidationError(
-            "You must fill a valid type: iOS, Android, back-end or front-end")
 
     def create(self, validated_data):
         validated_data["author"] = self.context["request"].user
@@ -34,23 +21,30 @@ class ProjectSerializer(ModelSerializer):
         ]
 
 class ContributorSerializer(ModelSerializer):
-    project_name = CharField(max_length=150)
+    project_id = IntegerField(min_value=1)
 
     class Meta:
         model = Contributor
         fields = [
-            "project_name"
+            "project_id"
         ]
 
     def create(self, validated_data):
-        project_name = validated_data.pop("project_name")
+        project_id = validated_data.pop("project_id")
         try:
-            project = Project.objects.get(name=project_name)
+            project = Project.objects.get(pk=project_id)
         except Project.DoesNotExist:
             raise ValidationError(
                 "the project you are trying to join doesn't exist"
             )
-        return Contributor.objects.create(
-            project=project,
-            user=self.context["request"].user
-        )
+
+        try:
+            project = Contributor.objects.create(
+                project=project,
+                user=self.context["request"].user
+            )
+            return project
+        except IntegrityError:
+            raise ValidationError(
+                "you are already a contributor of this project"
+            )
