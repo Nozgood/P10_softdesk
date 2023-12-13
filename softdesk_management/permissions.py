@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from softdesk_management.models import Contributor
+from softdesk_management.models import Contributor, Project
 
 class IsProjectContributor(BasePermission):
 
@@ -8,7 +8,26 @@ class IsProjectContributor(BasePermission):
             return True
 
         project_id = view.kwargs.get('project_id')
+
         return Contributor.objects.filter(
             project_id=project_id,
             user=request.user
         ).exists()
+
+
+class IsProjectAuthor(BasePermission):
+
+    def has_permission(self, request, view):
+        print(request.method)
+        if request.method == "POST" or request.method == "GET":
+            return True
+
+        project_id = view.kwargs.get('project_id')
+        print("permission to udpate")
+        try:
+            project = Project.objects.get(pk=project_id)
+            print(project.author == request.user)
+            return project.author == request.user
+
+        except Project.DoesNotExist:
+            return False

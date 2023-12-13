@@ -5,12 +5,21 @@ from rest_framework.serializers import (
 )
 from softdesk_management.models import Project, Contributor
 from django.db import IntegrityError
+from django.utils import timezone
 
 class ProjectSerializer(ModelSerializer):
 
     def create(self, validated_data):
         validated_data["author"] = self.context["request"].user
         return Project.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data["name"]
+        instance.description = validated_data["description"]
+        instance.type = validated_data["type"]
+        instance.updated_at = timezone.now()
+        instance.save()
+        return instance
 
     class Meta:
         model = Project

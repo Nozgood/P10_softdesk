@@ -15,12 +15,12 @@ urlpatterns = [
         name='create_project'
     ),
     path(
-        'project/update/<int:id>',
+        'project/update/<int:project_id>',
         ProjectAPIView.as_view(),
         name='update_project'
     ),
     path(
-        'project/delete/<int:id>',
+        'project/delete/<int:project_id>',
         ProjectAPIView.as_view(),
         name='delete_project'
     ),

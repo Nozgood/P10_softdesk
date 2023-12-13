@@ -117,7 +117,7 @@ class UserAPIView(APIView):
                         "response": "success",
                         "message": "user successfully updated"
                     },
-                    status=201
+                    status=200
                 )
         except JSONDecodeError:
             return JsonResponse(
