@@ -4,12 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from json import JSONDecodeError
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 
-from softdesk_management.serializers import (
-    ProjectSerializer,
-    ContributorSerializer
-)
+from softdesk_management import serializers
 from softdesk_management.models import Contributor, Project
 from softdesk_management.permissions import (
     IsProjectContributor,
@@ -27,7 +24,7 @@ class ProjectAPIView(APIView):
     def post(request):
         try:
             data = JSONParser().parse(request)
-            serializer = ProjectSerializer(
+            serializer = serializers.ProjectSerializer(
                 data=data,
                 context={"request": request}
             )
@@ -71,7 +68,7 @@ class ProjectAPIView(APIView):
         try:
             project = get_object_or_404(Project, pk=project_id)
             data = JSONParser().parse(request)
-            serializer = ProjectSerializer(project, data=data)
+            serializer = serializers.ProjectSerializer(project, data=data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return JsonResponse(
@@ -118,7 +115,7 @@ class ContributorAPIView(APIView):
     def post(request):
         try:
             data = JSONParser().parse(request)
-            serializer = ContributorSerializer(
+            serializer = serializers.ContributorSerializer(
                 data=data,
                 context={
                     "request": request
@@ -141,3 +138,32 @@ class ContributorAPIView(APIView):
                 },
                 status=400)
 
+class IssueAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def post(request):
+        try:
+            data = JSONParser().parse(request)
+            serializer = serializers.IssueSerializer(
+                data=data,
+                context={
+                    "request": request
+                }
+            )
+            if serializer.is_valid(raise_exception=True):
+                issue = serializer.save()
+                return JsonResponse(
+                    {
+                        "message": "success",
+                        "issue_id": issue.id
+                    },
+                    status=200
+                )
+        except JSONDecodeError:
+            return JsonResponse(
+                {
+                    "response": "error",
+                    "message": "JSON decoding error"
+                },
+                status=400)

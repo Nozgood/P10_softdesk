@@ -1,32 +1,37 @@
 from django.urls import path
-from softdesk_management.views import ProjectAPIView, ContributorAPIView
+from softdesk_management import views
 
 app_name = "softdesk"
 
 urlpatterns = [
     path(
         'project/create/',
-        ProjectAPIView.as_view(),
+        views.ProjectAPIView.as_view(),
         name='create_project'
     ),
     path(
         'project/get/<int:project_id>',
-        ProjectAPIView.as_view(),
+        views.ProjectAPIView.as_view(),
         name='create_project'
     ),
     path(
         'project/update/<int:project_id>',
-        ProjectAPIView.as_view(),
+        views.ProjectAPIView.as_view(),
         name='update_project'
     ),
     path(
         'project/delete/<int:project_id>',
-        ProjectAPIView.as_view(),
+        views.ProjectAPIView.as_view(),
         name='delete_project'
     ),
     path(
         'project/contribute/',
-        ContributorAPIView.as_view(),
+        views.ContributorAPIView.as_view(),
         name="contribute"
     ),
+    path(
+        'issue/create/',
+        views.IssueAPIView.as_view(),
+        name='create_issue'
+    )
 ]
