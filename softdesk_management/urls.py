@@ -33,5 +33,20 @@ urlpatterns = [
         'issue/create/',
         views.IssueAPIView.as_view(),
         name='create_issue'
-    )
+    ),
+    path(
+        'issue/get/<int:issue_id>',
+        views.IssueAPIView.as_view(),
+        name='get_issue'
+    ),
+    path(
+        'issue/update/<int:issue_id>',
+        views.IssueAPIView.as_view(),
+        name='update_issue'
+    ),
+    path(
+        'issue/delete/<int:issue_id>',
+        views.IssueAPIView.as_view(),
+        name='delete_issue'
+    ),
 ]

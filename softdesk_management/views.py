@@ -7,10 +7,11 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
 from softdesk_management import serializers
-from softdesk_management.models import Contributor, Project
+from softdesk_management.models import Contributor, Project, Issue
 from softdesk_management.permissions import (
     IsProjectContributor,
     IsProjectAuthor,
+    IsProjectIssueContributor
 )
 
 class ProjectAPIView(APIView):
@@ -139,7 +140,10 @@ class ContributorAPIView(APIView):
                 status=400)
 
 class IssueAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        IsProjectIssueContributor
+    ]
 
     @staticmethod
     def post(request):
@@ -167,3 +171,21 @@ class IssueAPIView(APIView):
                     "message": "JSON decoding error"
                 },
                 status=400)
+        
+    @staticmethod
+    def get(request, issue_id):
+        issue = get_object_or_404(Issue, pk=issue_id)
+        return JsonResponse(
+            {
+                "related_project": issue.project.name,
+                "reporter": issue.reporter.username,
+                "assign": issue.attribution.username,
+                "name": issue.name,
+                "description": issue.problem,
+                "type": issue.type,
+                "priority": issue.priority,
+                "status": issue.status,
+                "created_at": issue.created_at,
+            },
+            status=200
+        )

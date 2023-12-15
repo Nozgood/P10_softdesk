@@ -61,8 +61,8 @@ class ContributorSerializer(ModelSerializer):
 
 
 class IssueSerializer(ModelSerializer):
-    project_id = IntegerField(min_value=1)
-    attribution_id = IntegerField(min_value=1, allow_null=True, required=False)
+    project_id = IntegerField(min_value=1, required=True)
+    attribution_id = IntegerField(allow_null=True, required=False)
 
     class Meta:
         model = models.Issue
