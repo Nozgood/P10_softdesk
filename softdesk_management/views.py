@@ -6,8 +6,11 @@ from json import JSONDecodeError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
-from softdesk_management import serializers
-from softdesk_management.models import Contributor, Project, Issue
+from softdesk_management.serializers import (
+    ProjectSerializer,
+    ContributorSerializer
+)
+from softdesk_management.models import Contributor, Project
 from softdesk_management.permissions import (
     IsProjectContributor,
     IsProjectAuthor
@@ -24,7 +27,7 @@ class ProjectAPIView(APIView):
     def post(request):
         try:
             data = JSONParser().parse(request)
-            serializer = serializers.ProjectSerializer(
+            serializer = ProjectSerializer(
                 data=data,
                 context={"request": request}
             )
@@ -68,7 +71,7 @@ class ProjectAPIView(APIView):
             project = get_object_or_404(Project, pk=project_id)
             self.check_object_permissions(request, project)
             data = JSONParser().parse(request)
-            serializer = serializers.ProjectSerializer(project, data=data)
+            serializer = ProjectSerializer(project, data=data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return JsonResponse(
@@ -90,7 +93,10 @@ class ProjectAPIView(APIView):
     def delete(self, request, project_id):
         try:
             project = get_object_or_404(Project, pk=project_id)
-            self.check_object_permissions(request, project)
+            self.check_object_permissions(
+                request=request,
+                obj=project
+            )
             project.delete()
             return JsonResponse(
                 {
@@ -116,7 +122,7 @@ class ContributorAPIView(APIView):
     def post(request):
         try:
             data = JSONParser().parse(request)
-            serializer = serializers.ContributorSerializer(
+            serializer = ContributorSerializer(
                 data=data,
                 context={
                     "request": request
@@ -139,53 +145,3 @@ class ContributorAPIView(APIView):
                 },
                 status=400)
 
-class IssueAPIView(APIView):
-    permission_classes = [
-        IsAuthenticated,
-        IsProjectContributor
-    ]
-
-    @staticmethod
-    def post(request):
-        try:
-            data = JSONParser().parse(request)
-            serializer = serializers.IssueSerializer(
-                data=data,
-                context={
-                    "request": request
-                }
-            )
-            if serializer.is_valid(raise_exception=True):
-                issue = serializer.save()
-                return JsonResponse(
-                    {
-                        "message": "success",
-                        "issue_id": issue.id
-                    },
-                    status=200
-                )
-        except JSONDecodeError:
-            return JsonResponse(
-                {
-                    "response": "error",
-                    "message": "JSON decoding error"
-                },
-                status=400)
-        
-    @staticmethod
-    def get(request, issue_id):
-        issue = get_object_or_404(Issue, pk=issue_id)
-        return JsonResponse(
-            {
-                "related_project": issue.project.name,
-                "reporter": issue.reporter.username,
-                "assign": issue.attribution.username,
-                "name": issue.name,
-                "description": issue.problem,
-                "type": issue.type,
-                "priority": issue.priority,
-                "status": issue.status,
-                "created_at": issue.created_at,
-            },
-            status=200
-        )

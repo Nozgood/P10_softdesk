@@ -1,7 +1,8 @@
 from rest_framework.permissions import BasePermission
-from softdesk_management.models import Contributor, Project, Issue
+from softdesk_management.models import Contributor
 
 class IsProjectContributor(BasePermission):
+
     def has_object_permission(self, request, view, obj):
         return Contributor.objects.filter(
             project=obj,

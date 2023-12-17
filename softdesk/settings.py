@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'softdesk_management',
+    'softdesk_issue',
     'rest_framework_simplejwt',
 ]
 
