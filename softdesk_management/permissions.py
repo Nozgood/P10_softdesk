@@ -15,22 +15,3 @@ class IsProjectAuthor(BasePermission):
             return True
 
         return obj.author == request.user
-
-class IsProjectIssueContributor(BasePermission):
-
-    def has_permission(self, request, view):
-        if request.method == "POST":
-            return True
-
-        issue_id = view.kwargs.get('issue_id')
-        try:
-            issue = Issue.objects.get(
-                pk=issue_id
-            )
-            project = issue.project
-            return Contributor.objects.filter(
-                project=project,
-                user=request.user
-            ).exists()
-        except Issue.DoesNotExist:
-            return False

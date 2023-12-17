@@ -10,8 +10,7 @@ from softdesk_management import serializers
 from softdesk_management.models import Contributor, Project, Issue
 from softdesk_management.permissions import (
     IsProjectContributor,
-    IsProjectAuthor,
-    IsProjectIssueContributor
+    IsProjectAuthor
 )
 
 class ProjectAPIView(APIView):
@@ -143,7 +142,7 @@ class ContributorAPIView(APIView):
 class IssueAPIView(APIView):
     permission_classes = [
         IsAuthenticated,
-        IsProjectIssueContributor
+        IsProjectContributor
     ]
 
     @staticmethod
