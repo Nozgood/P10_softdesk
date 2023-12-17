@@ -3,31 +3,16 @@ from softdesk_management.models import Contributor, Project
 
 class IsProjectContributor(BasePermission):
 
-    def has_permission(self, request, view):
-        if request.method == "POST":
-            return True
-
-        project_id = view.kwargs.get('project_id')
-
+    def has_object_permission(self, request, view, obj):
         return Contributor.objects.filter(
-            project_id=project_id,
+            project=obj,
             user=request.user
         ).exists()
 
 
 class IsProjectAuthor(BasePermission):
-
-    def has_permission(self, request, view):
-        print(request.method)
-        if request.method == "POST" or request.method == "GET":
+    def has_object_permission(self, request, view, obj):
+        if request.method == "GET":
             return True
 
-        project_id = view.kwargs.get('project_id')
-        print("permission to udpate")
-        try:
-            project = Project.objects.get(pk=project_id)
-            print(project.author == request.user)
-            return project.author == request.user
-
-        except Project.DoesNotExist:
-            return False
+        return obj.author == request.user

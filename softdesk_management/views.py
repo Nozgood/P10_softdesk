@@ -52,9 +52,12 @@ class ProjectAPIView(APIView):
                 },
                 status=400)
 
-    @staticmethod
-    def get(request, project_id):
+    def get(self, request, project_id):
         project = get_object_or_404(Project, pk=project_id)
+        self.check_object_permissions(
+            request=request,
+            obj=project
+        )
         return JsonResponse(
             {
                 "project_id": project.pk,
@@ -66,10 +69,13 @@ class ProjectAPIView(APIView):
             status=200
         )
 
-    @staticmethod
-    def put(request, project_id):
+    def put(self, request, project_id):
         try:
             project = get_object_or_404(Project, pk=project_id)
+            self.check_object_permissions(
+                request=request,
+                obj=project
+            )
             data = JSONParser().parse(request)
             serializer = ProjectSerializer(project, data=data)
             if serializer.is_valid(raise_exception=True):
@@ -93,6 +99,10 @@ class ProjectAPIView(APIView):
     def delete(self, request, project_id):
         try:
             project = get_object_or_404(Project, pk=project_id)
+            self.check_object_permissions(
+                request=request,
+                obj=project
+            )
             project.delete()
             return JsonResponse(
                 {
