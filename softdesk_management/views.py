@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from json import JSONDecodeError
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 
 from softdesk_management.serializers import (
     ProjectSerializer,
@@ -13,7 +13,7 @@ from softdesk_management.serializers import (
 from softdesk_management.models import Contributor, Project
 from softdesk_management.permissions import (
     IsProjectContributor,
-    IsProjectAuthor,
+    IsProjectAuthor
 )
 
 class ProjectAPIView(APIView):
@@ -53,11 +53,8 @@ class ProjectAPIView(APIView):
                 status=400)
 
     def get(self, request, project_id):
-        project = get_object_or_404(Project, pk=project_id)
-        self.check_object_permissions(
-            request=request,
-            obj=project
-        )
+        project = Project.objects.get(pk=project_id)
+        self.check_object_permissions(request, project)
         return JsonResponse(
             {
                 "project_id": project.pk,
@@ -72,10 +69,7 @@ class ProjectAPIView(APIView):
     def put(self, request, project_id):
         try:
             project = get_object_or_404(Project, pk=project_id)
-            self.check_object_permissions(
-                request=request,
-                obj=project
-            )
+            self.check_object_permissions(request, project)
             data = JSONParser().parse(request)
             serializer = ProjectSerializer(project, data=data)
             if serializer.is_valid(raise_exception=True):
