@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from softdesk_management.models import Contributor, Project
+from softdesk_management.models import Contributor
 
 class IsProjectContributor(BasePermission):
 
