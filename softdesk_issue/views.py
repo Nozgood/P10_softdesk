@@ -44,14 +44,15 @@ class IssueAPIView(APIView):
                 },
                 status=400)
 
-    @staticmethod
-    def get(request, issue_id):
+    def get(self, request, issue_id):
         issue = get_object_or_404(Issue, pk=issue_id)
+        self.check_object_permissions(request, issue)
         return JsonResponse(
             {
                 "related_project": issue.project.name,
                 "reporter": issue.reporter.username,
-                "assign": issue.attribution.username,
+                "assign": issue.attribution.username
+                if issue.attribution else None,
                 "name": issue.name,
                 "description": issue.problem,
                 "type": issue.type,
@@ -61,3 +62,17 @@ class IssueAPIView(APIView):
             },
             status=200
         )
+
+    def put(self, request, issue_id):
+        issue = get_object_or_404(Issue, pk=issue_id)
+        self.check_object_permissions(request, issue)
+        serializer = IssueSerializer(issue, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return JsonResponse(
+                {
+                    "response": "success",
+                    "message": "project successfully updated"
+                },
+                status=200
+            )

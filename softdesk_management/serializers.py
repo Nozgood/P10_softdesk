@@ -15,9 +15,8 @@ class ProjectSerializer(ModelSerializer):
         return models.Project.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.name = validated_data["name"]
-        instance.description = validated_data["description"]
-        instance.type = validated_data["type"]
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
         instance.updated_at = timezone.now()
         instance.save()
         return instance

@@ -6,7 +6,6 @@ from rest_framework.serializers import (
 from users import models as users_models
 from softdesk_issue.models import Issue
 from softdesk_management.models import Project, Contributor
-from django.db import IntegrityError
 from django.utils import timezone
 
 class IssueSerializer(ModelSerializer):
@@ -67,3 +66,10 @@ class IssueSerializer(ModelSerializer):
         validated_data["project"] = project
 
         return Issue.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.updated_at = timezone.now()
+        instance.save()
+        return instance
