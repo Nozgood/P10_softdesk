@@ -76,3 +76,14 @@ class IssueAPIView(APIView):
                 },
                 status=200
             )
+
+    def delete(self, request, issue_id):
+        issue = get_object_or_404(Issue, pk=issue_id)
+        self.check_object_permissions(request, issue)
+        issue.delete()
+        return JsonResponse(
+            {
+                "response": "success",
+                "message": "project successfully deleted",
+            },
+            status=200)

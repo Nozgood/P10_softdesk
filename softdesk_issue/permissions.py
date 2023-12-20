@@ -3,7 +3,7 @@ from softdesk_management.models import Contributor
 
 class IsProjectContributorForIssue(BasePermission):
     def has_permission(self, request, view):
-        if request.method == "GET":
+        if request.method == "GET" or "DELETE":
             return True
 
         project_id = request.data.get("project_id")
@@ -16,7 +16,11 @@ class IsProjectContributorForIssue(BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
-        return Contributor.objects.filter(
-            project_id=obj.project_id,
-            user=request.user
-        )
+        if request.method == "GET":
+            return Contributor.objects.filter(
+                project_id=obj.project_id,
+                user=request.user
+            )
+
+        return request.user == obj.reporter
+
