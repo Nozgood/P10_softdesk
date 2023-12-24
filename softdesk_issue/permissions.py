@@ -31,11 +31,11 @@ class IsProjectContributorForComment(BasePermission):
         if issue_id is None:
             return False
 
-        project_id = Issue.objects.get(
-            id=issue_id
-        ).project_id
-
         return Contributor.objects.filter(
-            project_id=project_id,
+            project__issue__id=issue_id,
             user=request.user
         )
+
+    def has_object_permission(self, request, view, obj):
+        if request.method == "GET":
+            return
