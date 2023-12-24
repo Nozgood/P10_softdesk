@@ -30,7 +30,7 @@ urlpatterns = [
         name='create_comment'
     ),
     path(
-        'comment/get/<int:comment_id>',
+        'comment/get/<str:comment_id>',
         CommentAPIView.as_view(),
         name='get_comment'
     ),

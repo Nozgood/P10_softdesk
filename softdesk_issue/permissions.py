@@ -27,6 +27,9 @@ class IsProjectContributorForIssue(BasePermission):
 
 class IsProjectContributorForComment(BasePermission):
     def has_permission(self, request, view):
+        if request.method == "GET" or "DELETE":
+            return True
+
         issue_id = request.data.get('issue_id')
         if issue_id is None:
             return False
@@ -34,8 +37,13 @@ class IsProjectContributorForComment(BasePermission):
         return Contributor.objects.filter(
             project__issue__id=issue_id,
             user=request.user
-        )
+        ).exists()
 
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
-            return
+            return Contributor.objects.filter(
+                project__issue__id=obj.issue_id,
+                user=request.user
+            ).exists()
+
+        return request.user == obj.author

@@ -10,7 +10,7 @@ from softdesk_issue.permissions import (
     IsProjectContributorForIssue,
     IsProjectContributorForComment
 )
-from softdesk_issue.models import Issue
+from softdesk_issue.models import Issue, Comment
 from softdesk_issue.serializers import IssueSerializer, CommentSerializer
 
 class IssueAPIView(APIView):
@@ -122,10 +122,21 @@ class CommentAPIView(APIView):
                 },
                 status=400)
 
-    def get(self, request):
-        pass
+    def get(self, request, comment_id):
+        comment = get_object_or_404(Comment, pk=comment_id)
+        self.check_object_permissions(request, comment)
+        return JsonResponse(
+            {
+                "id": comment.id,
+                "author": comment.author.username,
+                "description": comment.description,
+                "created_at": comment.created_at,
+                "updated_at": comment.updated_at
+            },
+            status=200
+        )
 
-    def update(self, request):
+    def put(self, request):
         pass
 
     def delete(self, request):
