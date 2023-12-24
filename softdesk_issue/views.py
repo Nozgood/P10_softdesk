@@ -73,7 +73,7 @@ class IssueAPIView(APIView):
             return JsonResponse(
                 {
                     "response": "success",
-                    "message": "project successfully updated"
+                    "message": "issue successfully updated"
                 },
                 status=200
             )
@@ -136,8 +136,27 @@ class CommentAPIView(APIView):
             status=200
         )
 
-    def put(self, request):
-        pass
+    def put(self, request, comment_id):
+        comment = get_object_or_404(Comment, pk=comment_id)
+        self.check_object_permissions(request, comment)
+        serializer = CommentSerializer(comment, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return JsonResponse(
+                {
+                    "response": "success",
+                    "message": "comment successfully updated"
+                },
+                status=200
+            )
 
-    def delete(self, request):
-        pass
+    def delete(self, request, comment_id):
+        comment = get_object_or_404(Comment, pk=comment_id)
+        self.check_object_permissions(request, comment)
+        comment.delete()
+        return JsonResponse(
+            {
+                "response": "success",
+                "message": "comment successfully deleted",
+            },
+            status=201)

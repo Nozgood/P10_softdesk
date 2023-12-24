@@ -75,3 +75,12 @@ class CommentSerializer(ModelSerializer):
     def create(self, validated_data):
         validated_data["author"] = self.context["request"].user
         return Comment.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        print(f"validated data: {validated_data.items()}")
+        for attr, value in validated_data.items():
+            print("okok")
+            setattr(instance, attr, value)
+        instance.updated_at = timezone.now()
+        instance.save()
+        return instance

@@ -35,12 +35,12 @@ urlpatterns = [
         name='get_comment'
     ),
     path(
-        'comment/update/<int:comment_id>',
+        'comment/update/<str:comment_id>',
         CommentAPIView.as_view(),
         name='update_comment'
     ),
     path(
-        'comment/delete/<int:comment_id>',
+        'comment/delete/<str:comment_id>',
         CommentAPIView.as_view(),
         name='delete_comment'
     )
