@@ -128,3 +128,5 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=365),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=700),
 }
+
+BASE_URL = 'http://127.0.0.1:8000/'

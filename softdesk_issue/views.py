@@ -7,10 +7,11 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
 from softdesk_issue.permissions import (
-    IsProjectContributorForIssue
+    IsProjectContributorForIssue,
+    IsProjectContributorForComment
 )
 from softdesk_issue.models import Issue
-from softdesk_issue.serializers import IssueSerializer
+from softdesk_issue.serializers import IssueSerializer, CommentSerializer
 
 class IssueAPIView(APIView):
     permission_classes = [
@@ -87,3 +88,45 @@ class IssueAPIView(APIView):
                 "message": "project successfully deleted",
             },
             status=200)
+
+class CommentAPIView(APIView):
+    permission_classes = [
+        IsAuthenticated,
+        IsProjectContributorForComment
+    ]
+
+    @staticmethod
+    def post(request):
+        try:
+            serializer = CommentSerializer(
+                data=request.data,
+                context={
+                    "request": request
+                }
+            )
+            if serializer.is_valid(raise_exception=True):
+                comment = serializer.save()
+                return JsonResponse(
+                    {
+                        "message": "success",
+                        "comment_id": comment.id,
+                        'link to issue': comment.issue_link
+                    },
+                    status=200
+                )
+        except JSONDecodeError:
+            return JsonResponse(
+                {
+                    "response": "error",
+                    "message": "JSON decoding error"
+                },
+                status=400)
+
+    def get(self, request):
+        pass
+
+    def update(self, request):
+        pass
+
+    def delete(self, request):
+        pass

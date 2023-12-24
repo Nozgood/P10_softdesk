@@ -1,5 +1,5 @@
 from django.urls import path
-from softdesk_issue.views import IssueAPIView
+from softdesk_issue.views import IssueAPIView, CommentAPIView
 
 app_name = "softdesk_issue"
 
@@ -23,5 +23,25 @@ urlpatterns = [
         'issue/delete/<int:issue_id>',
         IssueAPIView.as_view(),
         name='delete_issue'
+    ),
+    path(
+        'comment/create/',
+        CommentAPIView.as_view(),
+        name='create_comment'
+    ),
+    path(
+        'comment/get/<int:comment_id>',
+        CommentAPIView.as_view(),
+        name='get_comment'
+    ),
+    path(
+        'comment/update/<int:comment_id>',
+        CommentAPIView.as_view(),
+        name='update_comment'
+    ),
+    path(
+        'comment/delete/<int:comment_id>',
+        CommentAPIView.as_view(),
+        name='delete_comment'
     )
 ]

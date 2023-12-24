@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 from softdesk_management.models import Contributor
+from softdesk_issue.models import Issue
 
 class IsProjectContributorForIssue(BasePermission):
     def has_permission(self, request, view):
@@ -24,3 +25,17 @@ class IsProjectContributorForIssue(BasePermission):
 
         return request.user == obj.reporter
 
+class IsProjectContributorForComment(BasePermission):
+    def has_permission(self, request, view):
+        issue_id = request.data.get('issue_id')
+        if issue_id is None:
+            return False
+
+        project_id = Issue.objects.get(
+            id=issue_id
+        ).project_id
+
+        return Contributor.objects.filter(
+            project_id=project_id,
+            user=request.user
+        )

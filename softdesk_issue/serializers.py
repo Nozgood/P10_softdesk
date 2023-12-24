@@ -4,8 +4,8 @@ from rest_framework.serializers import (
     IntegerField
 )
 from users import models as users_models
-from softdesk_issue.models import Issue
-from softdesk_management.models import Project, Contributor
+from softdesk_issue.models import Issue, Comment
+from softdesk_management.models import Project
 from django.utils import timezone
 
 class IssueSerializer(ModelSerializer):
@@ -61,3 +61,17 @@ class IssueSerializer(ModelSerializer):
         instance.updated_at = timezone.now()
         instance.save()
         return instance
+
+class CommentSerializer(ModelSerializer):
+    issue_id = IntegerField(min_value=1, required=True)
+
+    class Meta:
+        model = Comment
+        fields = [
+            "issue_id",
+            "description"
+        ]
+
+    def create(self, validated_data):
+        validated_data["author"] = self.context["request"].user
+        return Comment.objects.create(**validated_data)

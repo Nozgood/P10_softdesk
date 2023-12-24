@@ -1,7 +1,7 @@
 from django.db import models
 from softdesk import settings
 from softdesk_management.models import Project
-
+import uuid
 
 class Issue(models.Model):
     class IssuePriority(models.TextChoices):
@@ -43,5 +43,28 @@ class Issue(models.Model):
         null=True,
         related_name='attribution'
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+class Comment(models.Model):
+
+    @property
+    def issue_link(self):
+        return settings.BASE_URL + 'api/issue/' + str(self.issue_id)
+
+    id = models.UUIDField(
+        primary_key=True,
+        editable=False,
+        default=uuid.uuid4,
+    )
+    issue = models.ForeignKey(
+        to=Issue,
+        on_delete=models.CASCADE,
+    )
+    author = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    description = models.CharField(max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
