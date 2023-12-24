@@ -34,8 +34,7 @@ class Issue(models.Model):
     type = models.CharField(max_length=7, choices=IssueType.choices)
     reporter = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
-        on_delete= models.SET_NULL,
-        null=True,
+        on_delete=models.CASCADE,
         related_name='reporter'
     )
     attribution = models.ForeignKey(

@@ -27,27 +27,15 @@ class IssueSerializer(ModelSerializer):
     def validate(self, attrs):
         project_id = attrs.get("project_id")
         attribution_id = attrs.get("attribution_id")
-        if attribution_id is not None:
-            if users_models.User.objects.filter(
-                pk=attribution_id
-            ).exists() is False:
-                raise ValidationError(
-                    "the assigned used does not exists"
-                )
-
-            if Contributor.objects.filter(
-                project_id=project_id,
-                user_id=attribution_id,
-            ).exists() is False:
-                raise ValidationError(
-                    "the user you want to assign the issue to is not "
-                    "a contributor of this project"
-                )
-
+        try:
             attrs["attribution"] = users_models.User.objects.get(
-                pk=attribution_id
+                pk=attribution_id,
+                contributor__project_id=project_id
             )
-
+        except users_models.User.DoesNotExist:
+            raise ValidationError(
+                "the assigned used does not exists or is not a contributor"
+            )
         return attrs
 
     def create(self, validated_data):
