@@ -1,12 +1,12 @@
-from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
-from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
-from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
-
-from json import JSONDecodeError
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from rest_framework.generics import (
+    GenericAPIView,
+    RetrieveAPIView,
+    CreateAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
+    ListAPIView
+)
 
 from softdesk_issue.permissions import (
     IsProjectContributorForIssue,
@@ -20,6 +20,14 @@ class InstantiateIssueView(GenericAPIView):
     serializer_class = IssueSerializer
     permission_classes = [IsAuthenticated, IsProjectContributorForIssue]
 
+class InstantiateCommentView(GenericAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [
+        IsAuthenticated,
+        IsProjectContributorForComment
+    ]
+
 class IssueCreateView(InstantiateIssueView, CreateAPIView):
     pass
 
@@ -32,75 +40,34 @@ class IssueUpdateView(InstantiateIssueView, UpdateAPIView):
 class IssueDeleteView(InstantiateIssueView, DestroyAPIView):
     pass
 
-class CommentAPIView(APIView):
-    permission_classes = [
-        IsAuthenticated,
-        IsProjectContributorForComment
-    ]
+class IssueListView(InstantiateIssueView, ListAPIView):
 
-    @staticmethod
-    def post(request):
-        try:
-            serializer = CommentSerializer(
-                data=request.data,
-                context={
-                    "request": request
-                }
-            )
-            if serializer.is_valid(raise_exception=True):
-                comment = serializer.save()
-                return JsonResponse(
-                    {
-                        "message": "success",
-                        "comment_id": comment.id,
-                        'link to issue': comment.issue_link
-                    },
-                    status=200
-                )
-        except JSONDecodeError:
-            return JsonResponse(
-                {
-                    "response": "error",
-                    "message": "JSON decoding error"
-                },
-                status=400)
+    def get_queryset(self):
+        queryset = Issue.objects.all()
+        project_id = self.request.query_params.get('project_id')
+        if project_id is not None:
+            queryset = queryset.filter(project_id=project_id)
 
-    def get(self, request, comment_id):
-        comment = get_object_or_404(Comment, pk=comment_id)
-        self.check_object_permissions(request, comment)
-        return JsonResponse(
-            {
-                "id": comment.id,
-                "author": comment.author.username,
-                "description": comment.description,
-                "issue_link": comment.issue_link,
-                "created_at": comment.created_at,
-                "updated_at": comment.updated_at
-            },
-            status=200
-        )
+        return queryset
 
-    def put(self, request, comment_id):
-        comment = get_object_or_404(Comment, pk=comment_id)
-        self.check_object_permissions(request, comment)
-        serializer = CommentSerializer(comment, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return JsonResponse(
-                {
-                    "response": "success",
-                    "message": "comment successfully updated"
-                },
-                status=200
-            )
+class CommentCreateView(InstantiateCommentView, CreateAPIView):
+    pass
 
-    def delete(self, request, comment_id):
-        comment = get_object_or_404(Comment, pk=comment_id)
-        self.check_object_permissions(request, comment)
-        comment.delete()
-        return JsonResponse(
-            {
-                "response": "success",
-                "message": "comment successfully deleted",
-            },
-            status=201)
+class CommentGetView(InstantiateCommentView, RetrieveAPIView):
+    pass
+
+class CommentUpdateView(InstantiateCommentView, UpdateAPIView):
+    pass
+
+class CommentDeleteView(InstantiateCommentView, DestroyAPIView):
+    pass
+
+class CommentListView(InstantiateCommentView, ListAPIView):
+
+    def get_queryset(self):
+        queryset = Comment.objects.all()
+        issue_id = self.request.query_params.get('issue_id')
+        if issue_id is not None:
+            queryset = queryset.filter(issue_id=issue_id)
+
+        return queryset
