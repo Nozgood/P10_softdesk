@@ -24,6 +24,11 @@ urlpatterns = [
         IssueAPIView.as_view(),
         name='delete_issue'
     ),
+    # path(
+    #     'issue/comments/',
+    #     IssueAPIView.as_view(),
+    #     name='list_comments'
+    # ),
     path(
         'comment/create/',
         CommentAPIView.as_view(),

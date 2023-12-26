@@ -130,6 +130,7 @@ class CommentAPIView(APIView):
                 "id": comment.id,
                 "author": comment.author.username,
                 "description": comment.description,
+                "issue_link": comment.issue_link,
                 "created_at": comment.created_at,
                 "updated_at": comment.updated_at
             },
