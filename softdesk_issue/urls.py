@@ -15,7 +15,7 @@ urlpatterns = [
         name='get_issue'
     ),
     path(
-        'issues/',
+        'issues',
         views.IssueListView.as_view(),
         name='list_issues'
     ),
@@ -35,22 +35,22 @@ urlpatterns = [
         name='create_comment'
     ),
     path(
-        'comment/get/<str:comment_id>',
+        'comment/get/<str:pk>',
         views.CommentGetView.as_view(),
         name='get_comment'
     ),
     path(
-        'comment/update/<str:comment_id>',
+        'comment/update/<str:pk>',
         views.CommentUpdateView.as_view(),
         name='update_comment'
     ),
     path(
-        'comment/delete/<str:comment_id>',
+        'comment/delete/<str:pk>',
         views.CommentDeleteView.as_view(),
         name='delete_comment'
     ),
     path(
-        'comments/',
+        'comments',
         views.CommentListView.as_view(),
         name='list_comments'
     )

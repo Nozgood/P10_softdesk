@@ -43,7 +43,7 @@ class IssueDeleteView(InstantiateIssueView, DestroyAPIView):
 class IssueListView(InstantiateIssueView, ListAPIView):
 
     def get_queryset(self):
-        queryset = Issue.objects.all()
+        queryset = Issue.objects.all().order_by('created_at')
         project_id = self.request.query_params.get('project_id')
         if project_id is not None:
             queryset = queryset.filter(project_id=project_id)
@@ -65,7 +65,8 @@ class CommentDeleteView(InstantiateCommentView, DestroyAPIView):
 class CommentListView(InstantiateCommentView, ListAPIView):
 
     def get_queryset(self):
-        queryset = Comment.objects.all()
+        queryset = Comment.objects.all().order_by('created_at')
+        print(f"query: {queryset}")
         issue_id = self.request.query_params.get('issue_id')
         if issue_id is not None:
             queryset = queryset.filter(issue_id=issue_id)
