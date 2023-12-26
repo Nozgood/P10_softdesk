@@ -4,7 +4,7 @@ from softdesk_issue.models import Issue
 
 class IsProjectContributorForIssue(BasePermission):
     def has_permission(self, request, view):
-        if request.method == "GET" or "DELETE":
+        if request.method == "GET" or request.method == "DELETE":
             return True
 
         project_id = request.data.get("project_id")
@@ -14,7 +14,7 @@ class IsProjectContributorForIssue(BasePermission):
         return Contributor.objects.filter(
             project_id=project_id,
             user=request.user
-        )
+        ).exists()
 
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
@@ -27,7 +27,7 @@ class IsProjectContributorForIssue(BasePermission):
 
 class IsProjectContributorForComment(BasePermission):
     def has_permission(self, request, view):
-        if request.method == "GET" or "DELETE":
+        if request.method == "GET" or request.method == "DELETE":
             return True
 
         issue_id = request.data.get('issue_id')

@@ -1,4 +1,6 @@
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 
@@ -13,81 +15,22 @@ from softdesk_issue.permissions import (
 from softdesk_issue.models import Issue, Comment
 from softdesk_issue.serializers import IssueSerializer, CommentSerializer
 
-class IssueAPIView(APIView):
-    permission_classes = [
-        IsAuthenticated,
-        IsProjectContributorForIssue
-    ]
+class InstantiateIssueView(GenericAPIView):
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer
+    permission_classes = [IsAuthenticated, IsProjectContributorForIssue]
 
-    @staticmethod
-    def post(request):
-        try:
-            serializer = IssueSerializer(
-                data=request.data,
-                context={
-                    "request": request
-                }
-            )
-            if serializer.is_valid(raise_exception=True):
-                issue = serializer.save()
-                return JsonResponse(
-                    {
-                        "message": "success",
-                        "issue_id": issue.id
-                    },
-                    status=200
-                )
-        except JSONDecodeError:
-            return JsonResponse(
-                {
-                    "response": "error",
-                    "message": "JSON decoding error"
-                },
-                status=400)
+class IssueCreateView(InstantiateIssueView, CreateAPIView):
+    pass
 
-    def get(self, request, issue_id):
-        issue = get_object_or_404(Issue, pk=issue_id)
-        self.check_object_permissions(request, issue)
-        return JsonResponse(
-            {
-                "related_project": issue.project.name,
-                "reporter": issue.reporter.username,
-                "assign": issue.attribution.username
-                if issue.attribution else None,
-                "name": issue.name,
-                "description": issue.problem,
-                "type": issue.type,
-                "priority": issue.priority,
-                "status": issue.status,
-                "created_at": issue.created_at,
-            },
-            status=200
-        )
+class IssueRetrieveView(InstantiateIssueView, RetrieveAPIView):
+    pass
 
-    def put(self, request, issue_id):
-        issue = get_object_or_404(Issue, pk=issue_id)
-        self.check_object_permissions(request, issue)
-        serializer = IssueSerializer(issue, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return JsonResponse(
-                {
-                    "response": "success",
-                    "message": "issue successfully updated"
-                },
-                status=200
-            )
+class IssueUpdateView(InstantiateIssueView, UpdateAPIView):
+    pass
 
-    def delete(self, request, issue_id):
-        issue = get_object_or_404(Issue, pk=issue_id)
-        self.check_object_permissions(request, issue)
-        issue.delete()
-        return JsonResponse(
-            {
-                "response": "success",
-                "message": "project successfully deleted",
-            },
-            status=200)
+class IssueDeleteView(InstantiateIssueView, DestroyAPIView):
+    pass
 
 class CommentAPIView(APIView):
     permission_classes = [
