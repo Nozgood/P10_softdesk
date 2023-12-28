@@ -24,9 +24,7 @@ class InstantiateCommentView(GenericAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [
-        IsAuthenticated,
-        IsProjectContributorForComment
-    ]
+        IsAuthenticated, IsProjectContributorForComment]
 
 class IssueCreateView(InstantiateIssueView, CreateAPIView):
     pass
@@ -66,7 +64,6 @@ class CommentListView(InstantiateCommentView, ListAPIView):
 
     def get_queryset(self):
         queryset = Comment.objects.all().order_by('created_at')
-        print(f"query: {queryset}")
         issue_id = self.request.query_params.get('issue_id')
         if issue_id is not None:
             queryset = queryset.filter(issue_id=issue_id)

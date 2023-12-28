@@ -6,27 +6,32 @@ app_name = "softdesk"
 urlpatterns = [
     path(
         'project/create/',
-        views.ProjectAPIView.as_view(),
+        views.ProjectCreateView.as_view(),
         name='create_project'
     ),
     path(
-        'project/get/<int:project_id>',
-        views.ProjectAPIView.as_view(),
+        'project/get/<int:pk>',
+        views.ProjectGetView.as_view(),
         name='create_project'
     ),
     path(
-        'project/update/<int:project_id>',
-        views.ProjectAPIView.as_view(),
+        'project/update/<int:pk>',
+        views.ProjectUpdateView.as_view(),
         name='update_project'
     ),
     path(
-        'project/delete/<int:project_id>',
-        views.ProjectAPIView.as_view(),
+        'project/delete/<int:pk>',
+        views.ProjectDeleteView.as_view(),
         name='delete_project'
     ),
     path(
+        'projects',
+        views.ProjectListView.as_view(),
+        name='list_projects'
+    ),
+    path(
         'project/contribute/',
-        views.ContributorAPIView.as_view(),
+        views.ContributorCreateView.as_view(),
         name="contribute"
     )
 ]

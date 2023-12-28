@@ -12,7 +12,12 @@ class ProjectSerializer(ModelSerializer):
 
     def create(self, validated_data):
         validated_data["author"] = self.context["request"].user
-        return models.Project.objects.create(**validated_data)
+        project = models.Project.objects.create(**validated_data)
+        models.Contributor.objects.create(
+            project=project,
+            user=self.context["request"].user
+        )
+        return project
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
@@ -39,7 +44,7 @@ class ContributorSerializer(ModelSerializer):
         ]
 
     def create(self, validated_data):
-        project_id = validated_data.pop("project_id")
+        project_id = validated_data.get("project_id")
         try:
             project = models.Project.objects.get(pk=project_id)
         except models.Project.DoesNotExist:

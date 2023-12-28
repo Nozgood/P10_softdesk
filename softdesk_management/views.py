@@ -1,10 +1,12 @@
-from rest_framework.views import APIView
-from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
-
-from json import JSONDecodeError
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from rest_framework.generics import (
+    GenericAPIView,
+    RetrieveAPIView,
+    CreateAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
+    ListAPIView
+)
 
 from softdesk_management.serializers import (
     ProjectSerializer,
@@ -16,132 +18,41 @@ from softdesk_management.permissions import (
     IsProjectAuthor
 )
 
-class ProjectAPIView(APIView):
+class InstantiateProjectView(GenericAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
     permission_classes = [
         IsAuthenticated,
         IsProjectContributor,
         IsProjectAuthor
     ]
 
-    @staticmethod
-    def post(request):
-        try:
-            data = JSONParser().parse(request)
-            serializer = ProjectSerializer(
-                data=data,
-                context={"request": request}
-            )
-            if serializer.is_valid(raise_exception=True):
-                project = serializer.save()
-                Contributor.objects.create(
-                    project=project,
-                    user=request.user
-                )
-                return JsonResponse(
-                    {
-                        "message": "project successfully created",
-                        "project ID": project.pk,
-                    },
-                    status=200
-                )
-        except JSONDecodeError:
-            return JsonResponse(
-                {
-                    "response": "error",
-                    "message": "JSON decoding error"
-                },
-                status=400)
+class ProjectCreateView(InstantiateProjectView, CreateAPIView):
+    pass
 
-    def get(self, request, project_id):
-        project = Project.objects.get(pk=project_id)
-        self.check_object_permissions(request, project)
-        return JsonResponse(
-            {
-                "project_id": project.pk,
-                "project_name": project.name,
-                "description": project.description,
-                "project_type": project.type,
-                "created_at": project.created_at,
-            },
-            status=200
-        )
+class ProjectGetView(InstantiateProjectView, RetrieveAPIView):
+    pass
 
-    def put(self, request, project_id):
-        try:
-            project = get_object_or_404(Project, pk=project_id)
-            self.check_object_permissions(request, project)
-            data = JSONParser().parse(request)
-            serializer = ProjectSerializer(project, data=data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return JsonResponse(
-                    {
-                        "response": "success",
-                        "message": "project successfully updated"
-                    },
-                    status=200
-                )
-        except JSONDecodeError:
-            return JsonResponse(
-                {
-                    "response": "error",
-                    "message": "JSON decoding error"
-                },
-                status=400
-            )
+class ProjectUpdateView(InstantiateProjectView, UpdateAPIView):
+    pass
 
-    def delete(self, request, project_id):
-        try:
-            project = get_object_or_404(Project, pk=project_id)
-            self.check_object_permissions(
-                request=request,
-                obj=project
-            )
-            project.delete()
-            return JsonResponse(
-                {
-                    "response": "success",
-                    "message": "project successfully deleted",
-                },
-                status=200)
+class ProjectDeleteView(InstantiateProjectView, DestroyAPIView):
+    pass
 
-        except JSONDecodeError:
-            return JsonResponse(
-                {
-                    "response": "error",
-                    "message": "JSON decoding error"
-                },
-                status=400
-            )
+class ProjectListView(InstantiateProjectView, ListAPIView):
 
+    def get_queryset(self):
+        queryset = Project.objects.all()
+        checked_queryset = []
+        for project in queryset:
+            if Contributor.objects.filter(
+                project=project,
+                user=self.request.user
+            ).exists():
+                checked_queryset.append(project)
+        return checked_queryset
 
-class ContributorAPIView(APIView):
+class ContributorCreateView(CreateAPIView):
+    queryset = Contributor.objects.all()
+    serializer_class = ContributorSerializer
     permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def post(request):
-        try:
-            data = JSONParser().parse(request)
-            serializer = ContributorSerializer(
-                data=data,
-                context={
-                    "request": request
-                }
-            )
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return JsonResponse(
-                    {
-                        "response": "success",
-                        "message": "You now contribute to project"
-                    },
-                    status=200
-                )
-        except JSONDecodeError:
-            return JsonResponse(
-                {
-                    "response": "error",
-                    "message": "JSON decoding error"
-                },
-                status=400)
-
