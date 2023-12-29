@@ -3,12 +3,11 @@
 ## Installation
 
 Voici les quelques étapes à suivre pour que vous puissiez pleinement tester le
-projet  
-A la racine du projet :
+projet. À la racine du projet :
 
-- `python3 -m venv env` pour créer un environnement virtuel
-- `source env/bin/activate` pour activer l'environnement
-- `pip install -r requirements.txt` pour installer les différentes dépendances
+- Exécutez `pip install pipenv` pour installer Pipenv si ce n'est pas déjà fait.
+- Lancez `pipenv install` pour créer un environnement virtuel et installer les dépendances.
+- Activez l'environnement virtuel avec `pipenv shell`.
 
 Ici une base de données locale est déjà présente, mais si vous souhaitiez
 repartir de 0 :
@@ -48,12 +47,11 @@ Enjoy :D
 
 ## Installation
 
-Here are the steps to follow so that you can fully test the project.
-At the root of the project:
+Here are the steps to follow to fully test the project. At the root of the project:
 
-- `python3 -m venv env` to create a virtual environment
-- `source env/bin/activate` to activate the environment
-- `pip install -r requirements.txt` to install dependencies
+- Run `pip install pipenv` to install Pipenv if it's not already installed.
+- Execute `pipenv install` to create a virtual environment and install dependencies.
+- Activate the virtual environment using `pipenv shell`.
 
 Here, a local database is already present, but if you wish to start from
 scratch:
