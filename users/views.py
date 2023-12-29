@@ -1,6 +1,5 @@
 from rest_framework.views import APIView
-from django.shortcuts import render, get_object_or_404
-from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from users.models import User
 from users.serializers import UserSerializer, LoginSerializer
 from rest_framework.parsers import JSONParser
@@ -13,21 +12,18 @@ from rest_framework.permissions import IsAuthenticated
 
 class SignUpAPIView(APIView):
     @staticmethod
-    def get(request):
-        return render(
-            request,
-            template_name='user.html',
-        )
-
-    @staticmethod
     def post(request):
         try:
             data = JSONParser().parse(request)
-            print(f"data : {data}")
             serializer = UserSerializer(data=data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                return Response(serializer.data)
+                return JsonResponse(
+                    {
+                        "message": "user successfully created"
+                    },
+                    status=201
+                )
         except JSONDecodeError:
             return JsonResponse(
                 {
@@ -42,17 +38,9 @@ class LoginAPIView(APIView):
     def post(request):
         try:
             data = JSONParser().parse(request)
-            print(f'data: {data}')
             serializer = LoginSerializer(data=data)
-            print(f"serializer: {serializer}")
             if not serializer.is_valid(raise_exception=True):
-                return JsonResponse(
-                    {
-                        "response": "error",
-                        "message": "JSON decoding error"
-                    },
-                    status=400
-                )
+                return
             user = get_object_or_404(
                 User,
                 username=serializer.data["username"],
@@ -74,6 +62,8 @@ class LoginAPIView(APIView):
                 {
                     "access_token": str(access_token),
                     "refresh_token": str(refresh_token),
+                    "access_token_duration_seconds":
+                        access_token.lifetime.total_seconds(),
                 },
                 status=201
             )
